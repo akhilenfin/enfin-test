@@ -120,4 +120,60 @@ const deleteBulk = expressAsyncHandler( async (req, res) => {
     }
 })
 
-module.exports = { createMovieController, listMovieController, editMovieController, updateMovieController, deleteMovieController, deleteBulk };
+const bulkUpload = expressAsyncHandler( async (req, res) => {
+    try{
+        const {movies} = req?.body;
+        let flag = true;
+        const user_id = req?.user.id; 
+        let transformedObject = [];
+        let errorTransformedObject = [];
+        let transformedObjectTemp = {};
+        let errorTransformedObjectTemp = {};
+        let i = 0;
+        let defects = {"0":[]};
+        for(var movie in movies){
+            let error = {};
+            flag = true;
+          transformedObjectTemp["user_id"] = user_id;
+
+            if(movies[movie].description == ''){
+                errorTransformedObjectTemp[i] = movies[movie];
+                
+                error ={"description": "Description null or empty"};
+                if (defects[i] !== undefined) {
+                    defects[i].push(error);
+                } else {
+                    // If the key doesn't exist, create a new array for it
+                    defects[i] = [];
+                    defects[i].push(error);
+                }
+                flag = false;
+            }
+            
+            if(flag){
+                transformedObjectTemp = movies[movie];
+                transformedObject.push({ transformedObjectTemp });
+            }else{
+                i++;
+            }
+        }
+        errorTransformedObject.push({ errorTransformedObjectTemp });
+        let filteredData =  transformedObject.map(obj => obj.transformedObjectTemp);
+        let errorFilteredData =  errorTransformedObject.map(obj => obj.errorTransformedObjectTemp);
+        const insertResult = await Movie.insertMany( filteredData );
+        res.status(200).json({ 
+            message: `${insertResult.length} documents`, 
+            data: {
+                insertedRow : insertResult.length, 
+                defectiveRecords : errorFilteredData, 
+                defects: defects
+            } 
+        });
+    }catch(err){
+        console.log(err)
+        res.status(400);
+        res.json({message: err.message});
+    }
+})
+
+module.exports = { createMovieController, listMovieController, editMovieController, updateMovieController, deleteMovieController, deleteBulk, bulkUpload };

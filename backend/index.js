@@ -2,6 +2,7 @@ require('dotenv').config()
 const http = require('http');
 const express = require('express');
 var cors = require('cors');
+var fileUpload = require('express-fileupload');
 
 const dbConnect = require('./config/db/dbConnect')
 const { connectStore } = require('./config/store')  
@@ -24,6 +25,7 @@ const init = async () => {
 
     app.use(cors())
     app.use(userRoutes)
+    app.use(fileUpload);
 
     app.use(notFound)
     app.use(errorHandler)

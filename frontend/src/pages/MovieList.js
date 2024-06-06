@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '../config/axiosConfig';
 import Pagination from './Pagination';
+import Upload from './Upload';
 
 
 const MovieList = () => {
@@ -112,6 +113,7 @@ const MovieList = () => {
       
     };
 
+
   return (
     <div className="card shadow">
   <div className="card-body">
@@ -143,6 +145,9 @@ const MovieList = () => {
           <button className="btn btn-primary float-right ml-3" type="button" onClick={handleAdd}>
             Add more +
           </button>
+          <Link className="btn btn-primary float-right ml-3" to={`/bulkupload`}>
+            Upload CSV
+          </Link>
           <button className="btn btn-primary float-right ml-3" type="button" onClick={handleBulkDelete}>
             Bulk Delete
           </button>
@@ -209,6 +214,10 @@ const MovieList = () => {
      
     </nav>
   </div>
+
+  
+
+
 </div>
 
   );
